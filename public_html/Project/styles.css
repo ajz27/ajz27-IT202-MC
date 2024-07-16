@@ -1,23 +1,68 @@
 .alert-success {
-    background-color: green
+    background-color: #28a745; 
+    color: white; 
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
 }
 
 .alert-warning {
-    background-color: yellow;
+    background-color: #ffc107; 
+    color: black; 
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
 }
 
 .alert-danger {
-    background-color: red;
+    background-color: #dc3545; 
+    color: white; 
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
 }
 
 .alert-info {
-    background-color: teal;
+    background-color: #17a2b8; 
+    color: white; 
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
 }
-nav li{display: inline; background-color: rebeccapurple;}
-nav li a{color: hotpink}
-input{border-radius: 50%;}
-body{
-    background-color: hotpink;
-    color: rgb(153, 0, 153);
 
+nav li {
+    display: inline;
+    background-color: #726363; 
+    margin-right: 10px; 
+    padding: 5px;
+    border-radius: 3px; 
 }
+
+nav li a {
+    color: #ffffff; 
+    text-decoration: none; 
+    padding: 5px 10px;
+    border-radius: 3px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+nav li a:hover {
+    background-color: #ff69b4; 
+    color: #6a0ec5; 
+}
+
+input {
+    border-radius: 20px; 
+    padding: 5px 10px;
+    border: 2px solid #663399; 
+    outline: none; 
+}
+
+body {
+    background-color: #000000; 
+    color: #ffffff; 
+    font-family: Arial, sans-serif; 
+    margin: 0;
+    padding: 0;
+}
+
