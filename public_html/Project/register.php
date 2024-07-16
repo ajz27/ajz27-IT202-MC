@@ -25,8 +25,51 @@ reset_session();
     function validate(form) {
         //TODO 1: implement JavaScript validation
         //ensure it returns false for an error and true for success
+        let email = form.email.value;
+        let pw = form.password.value;
+        let user = form.username.value;
+        let con = form.confirm.value;
+        let isValid = true;
+        if(email.length === 0 ) {
+            flash("Please provide email", "danger");
+            isValid = false;
+        }
+        else{
+            const pattern = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
+            if(!pattern.test(email)) {
+                flash("Email is invalid", "danger");
+                isValid = false;
+            }
+        }
 
-        return true;
+        if(user.length === 0) {
+            flash("Please provide username", "danger");
+            isValid = false;
+        }
+        else {
+            const pattern = /^[a-z0-9_-]{3,16}$/;
+            if (!pattern.test(user)) {
+                flash("Username is invalid", "danger");
+                isValid = false;
+            }
+        }
+
+        if(pw.length === 0) {
+            flash("Please provide a password", "danger");
+            isValid = false;
+        }
+        else {
+            const pattern = /.{8,}/;
+            if(!pattern.test(pw)) {
+                flash("Password is too short", "danger");
+                isValid = false;
+            }
+            if (pw !== con) {
+                flash("Password and Confrim password must match", "danger");
+                isValid = false;
+            }
+        }
+        return isValid;
     }
 </script>
 <?php
@@ -79,7 +122,7 @@ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm
         try {
             $stmt->execute([":email" => $email, ":password" => $hash, ":username" => $username]);
             flash("Successfully registered!", "success");
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             users_check_duplicate($e->errorInfo);
         }
     }
