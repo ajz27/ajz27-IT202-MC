@@ -17,6 +17,23 @@ require(__DIR__ . "/../../partials/nav.php");
         //TODO 1: implement JavaScript validation
         //ensure it returns false for an error and true for success
 
+        let email = form.email.value;
+        let password = form.password.value;
+
+        // validate email/username
+        let emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        let usernamePattern = /^[a-zA-Z0-9_-]{3,16}$/;
+        if (!emailPattern.test(email) && !usernamePattern.test(email)) {
+            alert("[Client] Please enter a valid email address or username .");
+            return false;
+        }
+
+        // validate password
+        if (password.length < 8) {
+            alert("[Client] Password must be at least 8 characters long.");
+            return false;
+        }
+
         //TODO update clientside validation to check if it should
         //valid email or username
         return true;

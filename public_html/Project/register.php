@@ -26,50 +26,36 @@ reset_session();
         //TODO 1: implement JavaScript validation
         //ensure it returns false for an error and true for success
         let email = form.email.value;
-        let pw = form.password.value;
-        let user = form.username.value;
-        let con = form.confirm.value;
-        let isValid = true;
-        if(email.length === 0 ) {
-            flash("Please provide email", "danger");
-            isValid = false;
-        }
-        else{
-            const pattern = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
-            if(!pattern.test(email)) {
-                flash("Email is invalid", "danger");
-                isValid = false;
-            }
+        let username = form.username.value;
+        let password = form.password.value;
+        let confirm = form.confirm.value;
+
+        // validation for email
+        let emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        if (!emailPattern.test(email)) {
+            alert("[Client] Please enter a valid email address.");
+            return false;
         }
 
-        if(user.length === 0) {
-            flash("Please provide username", "danger");
-            isValid = false;
-        }
-        else {
-            const pattern = /^[a-z0-9_-]{3,16}$/;
-            if (!pattern.test(user)) {
-                flash("Username is invalid", "danger");
-                isValid = false;
-            }
+        //validation for username 
+        let usernamePattern = /^[a-zA-Z0-9_-]{3,16}$/;
+        if (!usernamePattern.test(username)) {
+            alert("[Client] Username must  contain 3-16 characters a-z, 0-9, _, or -");
+            return false;
         }
 
-        if(pw.length === 0) {
-            flash("Please provide a password", "danger");
-            isValid = false;
+        // validation for password
+        if (password.length < 8) {
+            alert("[Client] Password must be at least 8 characters long.");
+            return false;
         }
-        else {
-            const pattern = /.{8,}/;
-            if(!pattern.test(pw)) {
-                flash("Password is too short", "danger");
-                isValid = false;
-            }
-            if (pw !== con) {
-                flash("Password and Confrim password must match", "danger");
-                isValid = false;
-            }
+
+        // confirm password validation
+        if (password !== confirm) {
+            alert("[Client] Passwords do not match.");
+            return false;
         }
-        return isValid;
+        return true;
     }
 </script>
 <?php
@@ -122,7 +108,7 @@ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm
         try {
             $stmt->execute([":email" => $email, ":password" => $hash, ":username" => $username]);
             flash("Successfully registered!", "success");
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             users_check_duplicate($e->errorInfo);
         }
     }
