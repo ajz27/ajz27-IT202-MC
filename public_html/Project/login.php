@@ -12,6 +12,7 @@ require(__DIR__ . "/../../partials/nav.php");
     </div>
     <input type="submit" value="Login" />
 </form>
+<!-- ajz27 7/15 -->
 <script>
     function validate(form) {
         //TODO 1: implement JavaScript validation
@@ -29,8 +30,8 @@ require(__DIR__ . "/../../partials/nav.php");
         }
 
         // validate password
-        if (password.length < 8) {
-            alert("[Client] Password must be at least 8 characters long.");
+        if (password.length === 0) {
+            alert("[Client] Invalid password.");
             return false;
         }
 
@@ -38,6 +39,7 @@ require(__DIR__ . "/../../partials/nav.php");
         //valid email or username
         return true;
     }
+    // ajz27 7/15
 </script>
 <?php
 //TODO 2: add PHP Code
@@ -120,6 +122,7 @@ if (isset($_POST["email"]) && isset($_POST["password"])) {
         }
     }
 }
+// ajz27 7/15
 ?>
 <?php
 require(__DIR__ . "/../../partials/flash.php");
