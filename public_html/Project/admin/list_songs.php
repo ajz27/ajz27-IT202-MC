@@ -7,18 +7,18 @@ if (!has_role("Admin")) {
     die(header("Location: $BASE_PATH" . "/home.php"));
 }
 
-// Initialize variables
-$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 25; // Default limit to 25
-$sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'ASC'; // Default sort order to ASC
 
-// Validate sort order
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 25; // default limit to 25
+$sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'ASC'; // default sort order to ASC
+
+// validate sort order
 $sort_order = strtoupper($sort_order) === 'DESC' ? 'DESC' : 'ASC';
 
 $query = "SELECT id, title, artist, song_key, image_url FROM ShazamSongs ORDER BY title $sort_order LIMIT :limit";
 $db = getDB();
 $stmt = $db->prepare($query);
 $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-
+//ajz27 7/29
 $results = [];
 try {
     $stmt->execute();
@@ -34,9 +34,9 @@ try {
 $table = [
     "data" => $results,
     "title" => "Latest Songs",
-    "ignored_columns" => [],  // Do not ignore any columns
+    "ignored_columns" => [],  
     "edit_url" => get_url("admin/edit_song.php"),
-    "view_url" => get_url("admin/view_song.php")  // URL for the View button
+    "view_url" => get_url("admin/view_song.php")  
 ];
 ?>
 <div class="container-fluid">
@@ -57,7 +57,7 @@ $table = [
     </form>
     <?php render_table($table); ?>
 </div>
-
+<!-- ajz27 7/29 -->
 <?php
 require_once(__DIR__ . "/../../../partials/flash.php");
 ?>

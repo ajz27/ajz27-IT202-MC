@@ -7,7 +7,7 @@ if (!has_role("Admin")) {
     die(header("Location: $BASE_PATH" . "/home.php"));
 }
 
-// Initialize variables
+
 $song = [];
 $isValid = false;
 
@@ -96,6 +96,7 @@ if (isset($_POST["delete"]) && $isValid) {
         <p>Invalid song selected.</p>
     <?php endif; ?>
 </div>
+<!-- ajz27 7/29 -->
 
 <?php
 require(__DIR__ . "/../../../partials/flash.php");

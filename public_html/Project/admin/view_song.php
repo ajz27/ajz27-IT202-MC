@@ -7,7 +7,7 @@ if (!has_role("Admin")) {
     die(header("Location: $BASE_PATH" . "/home.php"));
 }
 
-// Initialize variables
+
 $song = [];
 $isValid = false;
 
@@ -26,6 +26,7 @@ if (isset($_GET["id"])) {
         flash("Error loading song", "danger");
     }
 }
+//ajz27 7/29
 ?>
 
 <div class="container-fluid">
