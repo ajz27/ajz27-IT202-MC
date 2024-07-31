@@ -25,8 +25,9 @@ try {
 $table = [
     "data" => $results,
     "title" => "Latest Songs",
-    "ignored_columns" => [],
-    "edit_url" => get_url("admin/edit_song.php")
+    "ignored_columns" => [],  // Do not ignore any columns
+    "edit_url" => get_url("admin/edit_song.php"),
+    "view_url" => get_url("admin/view_song.php")  // URL for the View button
 ];
 ?>
 <div class="container-fluid">

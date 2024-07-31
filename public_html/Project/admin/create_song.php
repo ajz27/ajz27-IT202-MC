@@ -34,6 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+//ajz27 7/29
 ?>
 
 <div class="container-fluid">
@@ -58,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="submit" class="btn btn-primary">Add Song</button>
     </form>
 </div>
+<!-- ajz27 7/29 -->
 
 <?php
 require_once(__DIR__ . "/../../../partials/flash.php");
