@@ -7,9 +7,18 @@ if (!has_role("Admin")) {
     die(header("Location: $BASE_PATH" . "/home.php"));
 }
 
-$query = "SELECT id, title, artist, song_key, image_url FROM ShazamSongs ORDER BY created DESC LIMIT 25";
+// Initialize variables
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 25; // Default limit to 25
+$sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'ASC'; // Default sort order to ASC
+
+// Validate sort order
+$sort_order = strtoupper($sort_order) === 'DESC' ? 'DESC' : 'ASC';
+
+$query = "SELECT id, title, artist, song_key, image_url FROM ShazamSongs ORDER BY title $sort_order LIMIT :limit";
 $db = getDB();
 $stmt = $db->prepare($query);
+$stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+
 $results = [];
 try {
     $stmt->execute();
@@ -32,6 +41,20 @@ $table = [
 ?>
 <div class="container-fluid">
     <h3>List Songs</h3>
+    <form method="GET" class="mb-3">
+        <div class="form-group">
+            <label for="limit">Number of Entries</label>
+            <input type="number" name="limit" id="limit" value="<?php echo htmlspecialchars($limit); ?>" class="form-control" min="1" />
+        </div>
+        <div class="form-group">
+            <label for="sort">Sort Order</label>
+            <select name="sort" id="sort" class="form-control">
+                <option value="ASC" <?php echo $sort_order === 'ASC' ? 'selected' : ''; ?>>Ascending</option>
+                <option value="DESC" <?php echo $sort_order === 'DESC' ? 'selected' : ''; ?>>Descending</option>
+            </select>
+        </div>
+        <input type="submit" value="Apply" class="btn btn-primary" />
+    </form>
     <?php render_table($table); ?>
 </div>
 
