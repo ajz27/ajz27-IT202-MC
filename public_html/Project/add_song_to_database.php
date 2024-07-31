@@ -1,9 +1,11 @@
 <?php
 require(__DIR__ . "/../../partials/nav.php");
 
+is_logged_in(true);
+
 $result = [];
 if (isset($_GET["term"])) {
-    // Extract parameters from the GET request
+    
     $term = $_GET["term"];
     $locale = isset($_GET["locale"]) ? $_GET["locale"] : "en-US"; // Default locale to "en-US"
     $offset = isset($_GET["offset"]) ? intval($_GET["offset"]) : 0; // Default offset to 0
@@ -19,47 +21,39 @@ if (isset($_GET["term"])) {
     $isRapidAPI = true;
     $rapidAPIHost = "shazam.p.rapidapi.com";
 
-    // Use a function similar to get() for API requests
+    
     $result = get($endpoint, "STOCK_API_KEY", $data, $isRapidAPI, $rapidAPIHost);
 
-    // Example of cached data to save the results, uncomment if testing with cached data
-    /*
-    $result = [
-        "status" => 200,
-        "response" => '{
-            "tracks": {
-                "hits": [
-                    {
-                        "track": {
-                            "title": "Track Title 1",
-                            "subtitle": "Artist Name",
-                            "images": {
-                                "coverart": "https://example.com/image1.jpg"
-                            },
-                            "key": "Track Key 1"
-                        }
-                    },
-                    {
-                        "track": {
-                            "title": "Track Title 2",
-                            "subtitle": "Artist Name",
-                            "images": {
-                                "coverart": "https://example.com/image2.jpg"
-                            },
-                            "key": "Track Key 2"
-                        }
-                    }
-                ]
-            }
-        }'
-    ];
-    */
-    
     error_log("Response: " . var_export($result, true));
     if (se($result, "status", 400, false) == 200 && isset($result["response"])) {
         $result = json_decode($result["response"], true);
     } else {
         $result = [];
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $db = getDB();
+    $title = $_POST["title"];
+    $artist = $_POST["artist"];
+    $song_key = $_POST["song_key"];
+    $image_url = $_POST["image_url"];
+
+    
+    $query = "INSERT INTO ShazamSongs (title, artist, song_key, image_url) VALUES (:title, :artist, :song_key, :image_url)";
+    $params = [
+        ":title" => $title,
+        ":artist" => $artist,
+        ":song_key" => $song_key,
+        ":image_url" => $image_url
+    ];
+
+    try {
+        $stmt = $db->prepare($query);
+        $stmt->execute($params);
+        flash("Track added successfully", "success");
+    } catch (PDOException $e) {
+        flash("Error adding track: " . $e->getMessage(), "danger");
     }
 }
 ?>
@@ -87,6 +81,13 @@ if (isset($_GET["term"])) {
                     <p><?php echo htmlspecialchars($track['track']['subtitle']); ?></p>
                     <p>Key: <?php echo htmlspecialchars($track['track']['key'] ?? 'N/A'); ?></p>
                     <img src="<?php echo htmlspecialchars($track['track']['images']['coverart']); ?>" alt="Cover Art" />
+                    <form method="POST">
+                        <input type="hidden" name="title" value="<?php echo htmlspecialchars($track['track']['title']); ?>">
+                        <input type="hidden" name="artist" value="<?php echo htmlspecialchars($track['track']['subtitle']); ?>">
+                        <input type="hidden" name="song_key" value="<?php echo htmlspecialchars($track['track']['key']); ?>">
+                        <input type="hidden" name="image_url" value="<?php echo htmlspecialchars($track['track']['images']['coverart']); ?>">
+                        <button type="submit">Add to Database</button>
+                    </form>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
