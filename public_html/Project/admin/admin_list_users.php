@@ -9,7 +9,7 @@ if (!has_role("Admin")) {
 
 $db = getDB();
 
-$search_term = isset($_GET['search']) ? trim($_GET['search']) : '';
+$search_term = isset($_GET['user_id']) ? trim($_GET['user_id']) : '';
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 25; // default limit to 25
 $sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'ASC'; // default sort order to ASC
 
@@ -39,29 +39,29 @@ if (isset($params[':search_term'])) {
 $results = [];
 try {
     $stmt->execute();
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($r) {
+        $results = $r;
+    }
 } catch (PDOException $e) {
     error_log("Error fetching users: " . var_export($e, true));
     flash("Unhandled error occurred", "danger");
 }
 
-// Prepare the table configuration for render_table
+// Prepare the table configuration
 $table = [
     "data" => $results,
     "title" => "User List",
-    "ignored_columns" => [],
-    "view_url" => get_url("admin/view_user.php"), // URL to the user detail page
-    "view_label" => "View", // Text for view link
-    "view_classes" => "btn btn-primary", // CSS classes for view link
-    "primary_key" => "id" // Primary key for URL generation
+    "ignored_columns" => [],  
+    "view_url" => get_url("admin/view_user.php")  // URL to the user detail page
 ];
 ?>
 <div class="container-fluid">
     <h3>Admin User List</h3>
     <form method="GET" class="mb-3">
         <div class="form-group" id="search_value">
-            <label for="search">Search by ID or Username</label>
-            <input type="text" name="search" id="search" value="<?php echo htmlspecialchars($search_term ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="form-control" />
+            <label for="user_id">User ID or Username</label>
+            <input type="text" name="user_id" id="user_id" value="<?php echo htmlspecialchars($search_term ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="form-control" />
         </div>
         <div class="form-group">
             <label for="limit">Number of Entries</label>
@@ -76,9 +76,24 @@ $table = [
         </div>
         <input type="submit" value="Apply" class="btn btn-primary" />
     </form>
-    <?php
-    // Render the table using the render_table function
-    render_table($table);
+    <?php 
+    // Render the table with view links
+    if (!empty($results)) {
+        echo '<table class="table table-bordered">';
+        echo '<thead><tr><th>ID</th><th>Username</th><th>Actions</th></tr></thead>';
+        echo '<tbody>';
+        foreach ($results as $user) {
+            echo '<tr>';
+            echo '<td>' . htmlspecialchars($user['id']) . '</td>';
+            echo '<td>' . htmlspecialchars($user['username']) . '</td>';
+            echo '<td><a href="' . get_url('admin/view_user.php?user_id=' . urlencode($user['id'])) . '">View</a></td>';
+            echo '</tr>';
+        }
+        echo '</tbody>';
+        echo '</table>';
+    } else {
+        echo '<p>No users found.</p>';
+    }
     ?>
 </div>
 <?php

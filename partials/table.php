@@ -35,6 +35,8 @@
             return !in_array($v, $_ignored_columns);
         });
     }
+    // Check for custom column renderers
+    $_custom_renderers = isset($data["columns"]) ? $data["columns"] : [];
     ?>
     <?php if ($_title) : ?>
         <h3><?php se($_title); ?></h3>
@@ -59,11 +61,17 @@
                         <?php foreach ($_header_override as $col) : ?>
                             <?php if (!in_array($col, $_ignored_columns)) : ?>
                                 <td>
-                                    <?php if (filter_var($row[$col], FILTER_VALIDATE_URL) && in_array($col, ['coverart', 'image_url'])) : ?>
-                                        <img src="<?php se($row[$col]); ?>" alt="Cover Art" style="max-width: 100px; max-height: 100px;" />
-                                    <?php else : ?>
-                                        <?php se($row[$col]); ?>
-                                    <?php endif; ?>
+                                    <?php 
+                                    // Check if there's a custom renderer for the column
+                                    if (isset($_custom_renderers[$col]) && is_callable($_custom_renderers[$col])) {
+                                        echo $_custom_renderers[$col]($row);
+                                    } else {
+                                        if (filter_var($row[$col], FILTER_VALIDATE_URL) && in_array($col, ['coverart', 'image_url'])) : ?>
+                                            <img src="<?php se($row[$col]); ?>" alt="Cover Art" style="max-width: 100px; max-height: 100px;" />
+                                        <?php else : ?>
+                                            <?php se($row[$col]); ?>
+                                        <?php endif; ?>
+                                    <?php } ?>
                                 </td>
                             <?php endif; ?>
                         <?php endforeach; ?>
