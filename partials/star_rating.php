@@ -29,7 +29,7 @@ $readonly = isset($readonly) && $readonly ? 'readonly' : '';
 .star {
     font-size: 1.5rem;
     color: #ddd;
-    cursor: pointer; /* Added to change the cursor to pointer */
+    cursor: pointer; /* added to change the cursor to pointer */
 }
 
 .star.selected {
@@ -37,7 +37,7 @@ $readonly = isset($readonly) && $readonly ? 'readonly' : '';
 }
 
 .star-rating.readonly .star {
-    cursor: default; /* Retains default cursor for readonly stars */
+    cursor: default; /* retains default cursor for readonly stars */
 }
 </style>
 
