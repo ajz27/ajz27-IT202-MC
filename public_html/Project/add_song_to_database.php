@@ -60,6 +60,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         flash("Error adding track: " . $e->getMessage(), "danger");
     }
 }
+
+// ajz27 8/3
 ?>
 <div class="container-fluid">
     <h1>Top Tracks</h1>
