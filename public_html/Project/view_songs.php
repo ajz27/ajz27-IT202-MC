@@ -15,19 +15,33 @@ $sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'ASC'; // default sort orde
 $sort_order = strtoupper($sort_order) === 'DESC' ? 'DESC' : 'ASC';
 
 // Handle delete request
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['delete_song_id'])) {
-    $delete_song_id = intval($_POST['delete_song_id']);
-    $delete_query = "DELETE FROM ShazamSongs WHERE id = :id AND user_id = :user_id";
-    $delete_stmt = $db->prepare($delete_query);
-    $delete_stmt->bindParam(':id', $delete_song_id, PDO::PARAM_INT);
-    $delete_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (isset($_POST['delete_song_id'])) {
+        $delete_song_id = intval($_POST['delete_song_id']);
+        $delete_query = "DELETE FROM ShazamSongs WHERE id = :id AND user_id = :user_id";
+        $delete_stmt = $db->prepare($delete_query);
+        $delete_stmt->bindParam(':id', $delete_song_id, PDO::PARAM_INT);
+        $delete_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 
-    try {
-        $delete_stmt->execute();
-        flash("Song deleted successfully", "success");
-    } catch (PDOException $e) {
-        error_log("Error deleting song: " . var_export($e, true));
-        flash("Error deleting song", "danger");
+        try {
+            $delete_stmt->execute();
+            flash("Song deleted successfully", "success");
+        } catch (PDOException $e) {
+            error_log("Error deleting song: " . var_export($e, true));
+            flash("Error deleting song", "danger");
+        }
+    } elseif (isset($_POST['delete_all'])) {
+        $delete_all_query = "DELETE FROM ShazamSongs WHERE user_id = :user_id";
+        $delete_all_stmt = $db->prepare($delete_all_query);
+        $delete_all_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+
+        try {
+            $delete_all_stmt->execute();
+            flash("All songs deleted successfully", "success");
+        } catch (PDOException $e) {
+            error_log("Error deleting all songs: " . var_export($e, true));
+            flash("Error deleting all songs", "danger");
+        }
     }
 }
 
@@ -89,6 +103,9 @@ $table = [
             </select>
         </div>
         <input type="submit" value="Apply" class="btn btn-primary" />
+    </form>
+    <form method="POST" class="mb-3">
+        <button type="submit" name="delete_all" class="btn btn-danger">Delete All Songs</button>
     </form>
     <div class="row">
         <?php if (isset($results) && !empty($results)) : ?>
