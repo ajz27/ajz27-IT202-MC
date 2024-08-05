@@ -16,6 +16,19 @@ $sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'ASC'; // default sort orde
 // Validate sort order
 $sort_order = strtoupper($sort_order) === 'DESC' ? 'DESC' : 'ASC';
 
+// Build query to fetch total number of users
+$total_query = "SELECT COUNT(*) as total FROM Users";
+try {
+    $total_stmt = $db->prepare($total_query);
+    $total_stmt->execute();
+    $total_result = $total_stmt->fetch(PDO::FETCH_ASSOC);
+    $total_users = $total_result ? $total_result['total'] : 0;
+} catch (PDOException $e) {
+    error_log("Error fetching total users: " . var_export($e, true));
+    flash("Unhandled error occurred", "danger");
+    $total_users = 0;
+}
+
 // Build query to fetch users
 $query = "SELECT id, username FROM Users";
 $params = [];
@@ -37,11 +50,13 @@ if (isset($params[':search_term'])) {
 }
 
 $results = [];
+$displayed_users_count = 0;
 try {
     $stmt->execute();
     $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if ($r) {
         $results = $r;
+        $displayed_users_count = count($results);
     }
 } catch (PDOException $e) {
     error_log("Error fetching users: " . var_export($e, true));
@@ -51,12 +66,14 @@ try {
 $table = [
     "data" => $results,
     "title" => "User List",
-    "ignored_columns" => [],  
+    "ignored_columns" => [],
     "view_url" => get_url("admin/view_user.php")  // URL to the user detail page
 ];
 ?>
 <div class="container-fluid">
     <h3>Admin User List</h3>
+    <p>Total number of users: <?php echo $total_users; ?></p>
+    <p>Number of users displayed: <?php echo $displayed_users_count; ?></p>
     <form method="GET" class="mb-3">
         <div class="form-group" id="search_value">
             <label for="user_id">User ID or Username</label>
