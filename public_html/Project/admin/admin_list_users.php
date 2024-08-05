@@ -48,7 +48,6 @@ try {
     flash("Unhandled error occurred", "danger");
 }
 
-// Prepare the table configuration
 $table = [
     "data" => $results,
     "title" => "User List",
@@ -76,25 +75,7 @@ $table = [
         </div>
         <input type="submit" value="Apply" class="btn btn-primary" />
     </form>
-    <?php 
-    // Render the table with view links
-    if (!empty($results)) {
-        echo '<table class="table table-bordered">';
-        echo '<thead><tr><th>ID</th><th>Username</th><th>Actions</th></tr></thead>';
-        echo '<tbody>';
-        foreach ($results as $user) {
-            echo '<tr>';
-            echo '<td>' . htmlspecialchars($user['id']) . '</td>';
-            echo '<td>' . htmlspecialchars($user['username']) . '</td>';
-            echo '<td><a href="' . get_url('admin/view_user.php?user_id=' . urlencode($user['id'])) . '">View</a></td>';
-            echo '</tr>';
-        }
-        echo '</tbody>';
-        echo '</table>';
-    } else {
-        echo '<p>No users found.</p>';
-    }
-    ?>
+    <?php render_table($table); ?>
 </div>
 <?php
 require_once(__DIR__ . "/../../../partials/flash.php");

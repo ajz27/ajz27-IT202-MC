@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 }
-
+// ajz27 8/3
 // Query to fetch the total number of songs associated with the currently logged-in user
 $count_query = "SELECT COUNT(*) as total FROM ShazamSongs WHERE user_id = :user_id";
 $count_stmt = $db->prepare($count_query);
@@ -84,6 +84,7 @@ try {
     error_log("Error fetching songs: " . var_export($e, true));
     flash("Unhandled error occurred", "danger");
 }
+// ajz27 8/3
 
 $table = [
     "data" => $results,
@@ -137,6 +138,7 @@ $table = [
                     <form method="POST" class="d-inline">
                         <input type="hidden" name="delete_song_id" value="<?php echo htmlspecialchars($song['id']); ?>">
                         <button type="submit" class="btn btn-danger mt-2">Delete</button>
+                        <!-- ajz27 8/3 -->
                     </form>
                 </div>
             <?php endforeach; ?>
@@ -145,6 +147,7 @@ $table = [
         <?php endif; ?>
     </div>
 </div>
+<!-- ajz27 8/3 -->
 <?php
 require_once(__DIR__ . "/../../partials/flash.php");
 ?>
