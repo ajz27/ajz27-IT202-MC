@@ -31,6 +31,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['delete_song_id'])) {
     }
 }
 
+// Query to fetch the total number of songs associated with the currently logged-in user
+$count_query = "SELECT COUNT(*) as total FROM ShazamSongs WHERE user_id = :user_id";
+$count_stmt = $db->prepare($count_query);
+$count_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+
+$total_songs = 0;
+try {
+    $count_stmt->execute();
+    $total_result = $count_stmt->fetch(PDO::FETCH_ASSOC);
+    if ($total_result) {
+        $total_songs = $total_result['total'];
+    }
+} catch (PDOException $e) {
+    error_log("Error fetching total song count: " . var_export($e, true));
+    flash("Unhandled error occurred", "danger");
+}
+
 // Query to fetch songs associated with the currently logged-in user
 $query = "SELECT id, title, artist, song_key, image_url, rating FROM ShazamSongs WHERE user_id = :user_id ORDER BY title $sort_order LIMIT :limit";
 $stmt = $db->prepare($query);
@@ -58,9 +75,10 @@ $table = [
 ?>
 <div class="container-fluid">
     <h3>List of Your Songs</h3>
+    <p>Total number of entries: <?php echo $total_songs; ?></p>
     <form method="GET" class="mb-3">
         <div class="form-group">
-            <label for="limit">Number of Entries</label>
+            <label for="limit">Number of entries to show</label>
             <input type="number" name="limit" id="limit" value="<?php echo htmlspecialchars($limit); ?>" class="form-control" min="1" />
         </div>
         <div class="form-group">
