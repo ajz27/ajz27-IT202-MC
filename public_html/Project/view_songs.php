@@ -8,11 +8,16 @@ $db = getDB();
 
 $user_id = get_user_id(); // Get the currently logged-in user's ID
 
-$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 25; // default limit to 25
-$sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'ASC'; // default sort order to ASC
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10; // default limit to 10
+$sort_by = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'title'; // default sort by title
+$sort_order = isset($_GET['sort_order']) ? $_GET['sort_order'] : 'ASC'; // default sort order to ASC
 
 // Validate sort order
 $sort_order = strtoupper($sort_order) === 'DESC' ? 'DESC' : 'ASC';
+
+// Validate sort by field
+$valid_sort_by = ['title', 'rating'];
+$sort_by = in_array($sort_by, $valid_sort_by) ? $sort_by : 'title';
 
 // Handle delete request
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -63,7 +68,7 @@ try {
 }
 
 // Query to fetch songs associated with the currently logged-in user
-$query = "SELECT id, title, artist, song_key, image_url, rating FROM ShazamSongs WHERE user_id = :user_id ORDER BY title $sort_order LIMIT :limit";
+$query = "SELECT id, title, artist, song_key, image_url, rating FROM ShazamSongs WHERE user_id = :user_id ORDER BY $sort_by $sort_order LIMIT :limit";
 $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
@@ -96,8 +101,15 @@ $table = [
             <input type="number" name="limit" id="limit" value="<?php echo htmlspecialchars($limit); ?>" class="form-control" min="1" />
         </div>
         <div class="form-group">
-            <label for="sort">Sort Order</label>
-            <select name="sort" id="sort" class="form-control">
+            <label for="sort_by">Sort By</label>
+            <select name="sort_by" id="sort_by" class="form-control">
+                <option value="title" <?php echo $sort_by === 'title' ? 'selected' : ''; ?>>Title</option>
+                <option value="rating" <?php echo $sort_by === 'rating' ? 'selected' : ''; ?>>Rating</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="sort_order">Sort Order</label>
+            <select name="sort_order" id="sort_order" class="form-control">
                 <option value="ASC" <?php echo $sort_order === 'ASC' ? 'selected' : ''; ?>>Ascending</option>
                 <option value="DESC" <?php echo $sort_order === 'DESC' ? 'selected' : ''; ?>>Descending</option>
             </select>
