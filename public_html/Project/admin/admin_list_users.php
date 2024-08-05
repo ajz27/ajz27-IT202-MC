@@ -62,12 +62,12 @@ try {
     error_log("Error fetching users: " . var_export($e, true));
     flash("Unhandled error occurred", "danger");
 }
-
+// ajz27 8/3
 $table = [
     "data" => $results,
     "title" => "User List",
     "ignored_columns" => [],
-    "view_url" => get_url("admin/view_user.php")  // URL to the user detail page
+    "view_url" => get_url("profile.php")  // URL to the user detail page
 ];
 ?>
 <div class="container-fluid">
@@ -93,6 +93,7 @@ $table = [
         <input type="submit" value="Apply" class="btn btn-primary" />
     </form>
     <?php render_table($table); ?>
+    <!-- ajz27 8/3 -->
 </div>
 <?php
 require_once(__DIR__ . "/../../../partials/flash.php");
