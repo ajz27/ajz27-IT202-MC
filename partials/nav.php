@@ -51,6 +51,9 @@ session_start();
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo get_url('add_song_to_database.php'); ?>">Add Song</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo get_url('view_songs.php'); ?>">View Songs</a>
+                    </li>
                 <?php endif; ?>
                 <?php if (!is_logged_in()) : ?>
                     <li class="nav-item">

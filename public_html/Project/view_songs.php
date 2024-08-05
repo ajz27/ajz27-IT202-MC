@@ -3,6 +3,9 @@ require(__DIR__ . "/../../partials/nav.php");
 
 is_logged_in(true); // Ensure the user is logged in
 
+// Get the database connection
+$db = getDB();
+
 $user_id = get_user_id(); // Get the currently logged-in user's ID
 
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 25; // default limit to 25
@@ -11,9 +14,25 @@ $sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'ASC'; // default sort orde
 // Validate sort order
 $sort_order = strtoupper($sort_order) === 'DESC' ? 'DESC' : 'ASC';
 
+// Handle delete request
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['delete_song_id'])) {
+    $delete_song_id = intval($_POST['delete_song_id']);
+    $delete_query = "DELETE FROM ShazamSongs WHERE id = :id AND user_id = :user_id";
+    $delete_stmt = $db->prepare($delete_query);
+    $delete_stmt->bindParam(':id', $delete_song_id, PDO::PARAM_INT);
+    $delete_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+
+    try {
+        $delete_stmt->execute();
+        flash("Song deleted successfully", "success");
+    } catch (PDOException $e) {
+        error_log("Error deleting song: " . var_export($e, true));
+        flash("Error deleting song", "danger");
+    }
+}
+
 // Query to fetch songs associated with the currently logged-in user
 $query = "SELECT id, title, artist, song_key, image_url, rating FROM ShazamSongs WHERE user_id = :user_id ORDER BY title $sort_order LIMIT :limit";
-$db = getDB();
 $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
@@ -56,7 +75,7 @@ $table = [
     <div class="row">
         <?php if (isset($results) && !empty($results)) : ?>
             <?php foreach ($results as $song) : ?>
-                <div class="track">
+                <div class="track mb-3">
                     <h2><?php echo htmlspecialchars($song['title']); ?></h2>
                     <p><?php echo htmlspecialchars($song['artist']); ?></p>
                     <p>Key: <?php echo htmlspecialchars($song['song_key'] ?? 'N/A'); ?></p>
@@ -68,6 +87,10 @@ $table = [
                     </div>
                     <img src="<?php echo htmlspecialchars($song['image_url']); ?>" alt="Cover Art" style="max-width: 150px; height: auto;" />
                     <a href="view_song.php?id=<?php echo htmlspecialchars($song['id']); ?>" class="btn btn-info mt-2">View Details</a>
+                    <form method="POST" class="d-inline">
+                        <input type="hidden" name="delete_song_id" value="<?php echo htmlspecialchars($song['id']); ?>">
+                        <button type="submit" class="btn btn-danger mt-2">Delete</button>
+                    </form>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>

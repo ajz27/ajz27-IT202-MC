@@ -29,6 +29,7 @@ $readonly = isset($readonly) && $readonly ? 'readonly' : '';
 .star {
     font-size: 1.5rem;
     color: #ddd;
+    cursor: pointer; /* Added to change the cursor to pointer */
 }
 
 .star.selected {
@@ -36,22 +37,24 @@ $readonly = isset($readonly) && $readonly ? 'readonly' : '';
 }
 
 .star-rating.readonly .star {
-    cursor: default;
+    cursor: default; /* Retains default cursor for readonly stars */
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // only add click event listeners if not in readonly mode
-    if (!document.querySelector('.star-rating').classList.contains('readonly')) {
-        const stars = document.querySelectorAll('.star-rating .star');
+    document.querySelectorAll('.star-rating:not(.readonly)').forEach(function(starRatingElement) {
+        const stars = starRatingElement.querySelectorAll('.star');
+        const ratingInput = starRatingElement.querySelector('input[name="rating"]');
+
         stars.forEach(star => {
             star.addEventListener('click', function() {
                 const rating = parseInt(this.dataset.value);
-                document.getElementById('rating-' + this.closest('.star-rating').dataset.trackId).value = rating;
+                ratingInput.value = rating;
                 stars.forEach(s => s.classList.toggle('selected', parseInt(s.dataset.value) <= rating));
             });
         });
-    }
+    });
 });
 </script>
