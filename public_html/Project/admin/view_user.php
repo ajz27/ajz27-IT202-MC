@@ -92,10 +92,31 @@ try {
     flash("Unhandled error occurred", "danger");
 }
 
+// get total count of songs
+$total_songs_query = "SELECT COUNT(*) as total FROM ShazamSongs WHERE user_id = :user_id";
+$total_songs_stmt = $db->prepare($total_songs_query);
+$total_songs_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+
+$total_songs_count = 0;
+try {
+    $total_songs_stmt->execute();
+    $total_songs_result = $total_songs_stmt->fetch(PDO::FETCH_ASSOC);
+    $total_songs_count = $total_songs_result ? $total_songs_result['total'] : 0;
+} catch (PDOException $e) {
+    error_log("Error fetching total songs count: " . var_export($e, true));
+    flash("Unhandled error occurred", "danger");
+}
+
+// ..limit and offset for song display
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10; // Default limit to 10
+$offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
+
 // Query to fetch songs associated with the selected user
-$songs_query = "SELECT id, title, artist, song_key, image_url, rating FROM ShazamSongs WHERE user_id = :user_id";
+$songs_query = "SELECT id, title, artist, song_key, image_url, rating FROM ShazamSongs WHERE user_id = :user_id LIMIT :limit OFFSET :offset";
 $songs_stmt = $db->prepare($songs_query);
 $songs_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+$songs_stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+$songs_stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
 
 $songs = [];
 try {
@@ -109,8 +130,18 @@ try {
 <div class="container-fluid">
     <h3>User Details</h3>
     <p><strong>Username:</strong> <?php echo htmlspecialchars($user['username']); ?></p>
+    <p><strong>Total Songs:</strong> <?php echo $total_songs_count; ?></p>
     <h4>Songs Associated with This User</h4>
+    <form method="GET" class="mb-3">
+        <input type="hidden" name="id" value="<?php echo htmlspecialchars($user_id); ?>" />
+        <div class="form-group">
+            <label for="limit">Number of Songs to Display</label>
+            <input type="number" name="limit" id="limit" value="<?php echo htmlspecialchars($limit); ?>" class="form-control" min="1" />
+        </div>
+        <input type="submit" value="Apply" class="btn btn-primary" />
+    </form>
     <?php if ($songs): ?>
+        <p><strong>Songs Displayed:</strong> <?php echo count($songs); ?></p>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -147,7 +178,7 @@ try {
         <p>No songs found for this user.</p>
     <?php endif; ?>
 
-    <!-- Form to add a new song -->
+    <!-- form to add a new song -->
     <h4>Add New Song</h4>
     <form method="POST">
         <div class="mb-3">
