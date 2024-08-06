@@ -72,8 +72,9 @@ session_start();
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/create_role.php'); ?>">Create Role</a></li>
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/list_roles.php'); ?>">List Roles</a></li>
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/assign_roles.php'); ?>">Assign Roles</a></li>
-                            <!-- Added link to admin_list_users.php -->
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/admin_list_users.php'); ?>">List Users</a></li>
+                            <!-- Added link to admin_song_management.php -->
+                            <li><a class="dropdown-item" href="<?php echo get_url('admin/admin_song_management.php'); ?>">Song Management</a></li>
                         </ul>
                     </li>
                 <?php endif; ?>

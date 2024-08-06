@@ -106,6 +106,7 @@ try {
     error_log("Error fetching total songs count: " . var_export($e, true));
     flash("Unhandled error occurred", "danger");
 }
+//ajz27 8/3
 
 // ..limit and offset for song display
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10; // Default limit to 10

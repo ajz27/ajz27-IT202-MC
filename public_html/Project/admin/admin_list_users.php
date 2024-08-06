@@ -63,12 +63,12 @@ try {
     flash("Unhandled error occurred", "danger");
 }
 
-// Adjust URL to point to the correct location of view_user.php
+
 $table = [
     "data" => $results,
     "title" => "User List",
     "ignored_columns" => [],
-    "view_url" => get_url("admin/view_user.php")  // Adjusted URL to point to the admin directory
+    "view_url" => get_url("admin/view_user.php")  
 ];
 ?>
 <div class="container-fluid">
