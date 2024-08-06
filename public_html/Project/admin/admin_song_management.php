@@ -75,6 +75,13 @@ function get_users_by_username($db, $username) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function get_users_with_song($db, $song_key) {
+    $query = "SELECT u.id, u.username FROM Users u JOIN ShazamSongs s ON u.id = s.user_id WHERE s.song_key = :song_key";
+    $stmt = $db->prepare($query);
+    $stmt->execute([":song_key" => $song_key]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 ?>
 
 <div class="container-fluid">
@@ -115,7 +122,21 @@ function get_users_by_username($db, $username) {
                             <h6 class="card-subtitle mb-2 text-muted"><?php echo htmlspecialchars($track['track']['subtitle'] ?? ''); ?></h6>
                             <p class="card-text">Key: <?php echo htmlspecialchars($track['track']['key'] ?? 'N/A'); ?></p>
                             
-                            
+                            <!-- Display users who have saved this song -->
+                            <?php
+                            $users_with_song = get_users_with_song($db, $track['track']['key'] ?? '');
+                            ?>
+                            <h6>Users with this song:</h6>
+                            <?php if (!empty($users_with_song)) : ?>
+                                <ul class="list-unstyled">
+                                    <?php foreach ($users_with_song as $user) : ?>
+                                        <li><?php echo htmlspecialchars($user['username']); ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php else : ?>
+                                <p>None</p>
+                            <?php endif; ?>
+
                             <!-- Username Search and Assignment Form -->
                             <form method="POST">
                                 <input type="hidden" name="song_key" value="<?php echo htmlspecialchars($track['track']['key'] ?? ''); ?>">
@@ -123,7 +144,6 @@ function get_users_by_username($db, $username) {
                                 <input type="hidden" name="artist" value="<?php echo htmlspecialchars($track['track']['subtitle'] ?? ''); ?>">
                                 <input type="hidden" name="image_url" value="<?php echo htmlspecialchars($track['track']['images']['coverart'] ?? ''); ?>">
 
-                                <!-- Search for Users by Username -->
                                 <div class="form-group">
                                     <label for="username_search_<?php echo htmlspecialchars($track['track']['key'] ?? ''); ?>">Search Username</label>
                                     <input type="text" name="username_search" id="username_search_<?php echo htmlspecialchars($track['track']['key'] ?? ''); ?>" class="form-control">
@@ -132,7 +152,6 @@ function get_users_by_username($db, $username) {
                             </form>
 
                             <?php
-                            // Fetch users based on the search term for this track
                             if (isset($_POST["username_search"])) {
                                 $username = se($_POST, "username_search", "", false);
                                 if (!empty($username)) {
@@ -144,7 +163,6 @@ function get_users_by_username($db, $username) {
                             }
                             ?>
 
-                            <!-- User Checkboxes -->
                             <?php if (!empty($users)) : ?>
                                 <form method="POST">
                                     <input type="hidden" name="song_key" value="<?php echo htmlspecialchars($track['track']['key'] ?? ''); ?>">
