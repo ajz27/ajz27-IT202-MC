@@ -59,7 +59,9 @@
                         <?php foreach ($_header_override as $col) : ?>
                             <?php if (!in_array($col, $_ignored_columns)) : ?>
                                 <td>
-                                    <?php if (filter_var($row[$col], FILTER_VALIDATE_URL) && in_array($col, ['coverart', 'image_url'])) : ?>
+                                    <?php if ($col === 'username' && $_view_url) : ?>
+                                        <a href="<?php echo get_url('profile.php'); ?>?id=<?php se($row['id']); ?>"><?php se($row[$col]); ?></a>
+                                    <?php elseif (filter_var($row[$col], FILTER_VALIDATE_URL) && in_array($col, ['coverart', 'image_url'])) : ?>
                                         <img src="<?php se($row[$col]); ?>" alt="Cover Art" style="max-width: 100px; max-height: 100px;" />
                                     <?php else : ?>
                                         <?php se($row[$col]); ?>
